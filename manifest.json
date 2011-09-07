@@ -1,0 +1,16 @@
+{
+  "name": "Cheap Song Finder",
+  "version": "1.0",
+  "description": "Tries to find cheapest song while browsing beatport.",
+  "content_scripts":[
+  {
+  	"matches":["http://www.beatport.com/*"],
+  	"js":["jquery.js", "content_script.js"]
+  }
+  ],
+  "permissions": [
+    "http://api.beatport.com/*",
+    "http://www.beatport.com/*",
+    "http://*/*"
+  ]
+}
