@@ -1,0 +1,32 @@
+
+    <script>
+      //Global accessor that the popup uses
+      var songs = [];
+      //this is done so we can have our page action on every beatport page!
+      function updatePageAction(tabId)
+      {
+        chrome.tabs.sendRequest(tabId, {is_beatport: true}, function(response) {
+          if (response.is_beatport)
+            chrome.pageAction.show(tabId);
+            songs = [];
+        });
+      };
+
+      chrome.tabs.onUpdated.addListener(function(tabId, change, tab) {
+        if (change.status == "complete") {
+          updatePageAction(tabId);
+        }
+      });
+
+
+      function content_script_finished(request, sender, response)
+      {
+        //Grab the request and fill in the songs map for the popup.html
+        songs.push(request);
+        //Return nothing to let the connection be cleaned up
+        response({});
+      };
+
+      chrome.extension.onRequest.addListener(content_script_finished);
+
+    </script>

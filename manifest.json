@@ -1,14 +1,22 @@
 {
-  "name": "Cheap Song Finder",
+  "name": "Beatport Song Matcher",
   "version": "1.0",
   "description": "Tries to find cheapest song while browsing beatport.",
+  "background_page": "background.html",
+  "page_action": {
+  	"default_name" : "Find cheap songs",
+  	"default_icon": "Images/icon.png",
+  	"default_popup": "popup.html"
+  },
   "content_scripts":[
   {
   	"matches":["http://www.beatport.com/*"],
+  	"run_at" : "document_idle",
   	"js":["jquery.js", "content_script.js"]
   }
   ],
   "permissions": [
+  	"tabs",
     "http://api.beatport.com/*",
     "http://www.beatport.com/*",
     "http://*/*"

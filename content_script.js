@@ -6,6 +6,17 @@ var SCRAPE_DEBUG = false;
 var timeout = null;
 var API_MAP = { "track" : "http://api.beatport.com/catalog/tracks", "release" : "http://api.beatport.com/catalog/tracks",
 				 "iTunes" : "http://itunes.apple.com/search" };
+
+
+// The background page is asking us to find an address on the page.
+if (window == top) {
+  chrome.extension.onRequest.addListener(function(req, sender, sendResponse) {
+    	if (req.is_beatport)
+    		start();
+    		sendResponse({is_beatport: true});
+  });
+};
+
 /*
 Debug specific functions go here
 */
@@ -17,7 +28,6 @@ function dbprint(value)
 		console.debug(value);
 	}
 }
-
 /*
 In order to continously scrape the songs as the user browses around,
 this hack works by listening to the DOMTree being modified. We need to attach
@@ -26,7 +36,6 @@ a timeout however because it fires multiple times for a single page change
 function listener()
 {
     dbprint("listener fired.");
-    start();
 }
 
 document.addEventListener("DOMSubtreeModified", function() {
@@ -69,6 +78,11 @@ function assign_song_values(beatport_song, track)
 	beatport_song.title = track.name;
 	beatport_song.price = track.price.usd; //let's just do USD for now
 	beatport_song.qualified_name = track.name + " ("+ track.mixName + ")";
+	beatport_song.artists = [];
+	for (var artistIndex in track.artists)
+	{
+		beatport_song.artists.push( track.artists[artistIndex].name);
+	}
 };
 
 function lookup_cheaper_songs(bp_song)
@@ -81,12 +95,32 @@ function search_itunes(bp_song)
 	$.getJSON(API_MAP["iTunes"],{ term : bp_song.qualified_name.replace(/\s/g,'+')}, function(data){
 		if (data.resultCount < 1)
 			return;
-		console.debug("searching: "+bp_song.qualified_name);
 		for (var trackIndex in data.results)
 		{
 			var track = data.results[trackIndex];
-			console.debug("\tFound track: " + track.trackName);
-			console.debug("\tFor the price: "+ track.trackPrice);
+			var isMatch = false;
+			for (var artistIndex in bp_song.artists)
+			{
+				var pattern= new RegExp(bp_song.artists[artistIndex], "g");
+				if (pattern.test(track.artistName))
+				{
+					//We've found a pretty strong match!
+					if (track.trackPrice < bp_song.price && track.trackPrice > 0) //trackPrice of -1 is AlbumOnly
+					{
+						bp_song.price = track.trackPrice;
+						bp_song.url = track.trackViewUrl;
+						console.debug("Found cheaper track!");
+						console.debug("\tTitle: "+bp_song.qualified_name);
+						console.debug("\tPrice: "+bp_song.price);
+						console.debug("\tUrl: "+ bp_song.url);
+						//send the scraped songs to the background.html file to be displayed in the popup
+						chrome.extension.sendRequest(bp_song, function(response) {
+						//we don't care bout the response
+						});
+					}
+				}
+			}
+
 		}	
 	});
 };
@@ -94,10 +128,11 @@ function search_itunes(bp_song)
 
 BeatportSong.prototype.type = "SongType";
 BeatportSong.prototype.id = "SongID";
-BeatportSong.prototype.artist = "SongArtist";
+BeatportSong.prototype.artists = [];
 BeatportSong.prototype.title = "SongTitle";
 BeatportSong.prototype.qualified_name = "Name&Mix";
 BeatportSong.prototype.price = 0;
+BeatportSong.prototype.url = "";
 
 
 /*
@@ -137,7 +172,6 @@ function start()
 
 		newSong = new BeatportSong(item_type, item_id);
 		scraped_songs.push(newSong);
-
 	});
 };
 
