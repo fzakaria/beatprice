@@ -101,7 +101,7 @@ function search_itunes(bp_song)
 			var isMatch = false;
 			for (var artistIndex in bp_song.artists)
 			{
-				var pattern= new RegExp(bp_song.artists[artistIndex], "g");
+				var pattern= new RegExp(bp_song.artists[artistIndex], "gi");
 				if (pattern.test(track.artistName))
 				{
 					//We've found a pretty strong match!
