@@ -4,7 +4,8 @@ GLOBAL VARIABLE DECLARATION
 var scraped_songs = [];
 var SCRAPE_DEBUG = false;
 var timeout = null;
-var API_MAP = { "track" : "http://api.beatport.com/catalog/tracks", "release" : "http://api.beatport.com/catalog/tracks" };
+var API_MAP = { "track" : "http://api.beatport.com/catalog/tracks", "release" : "http://api.beatport.com/catalog/tracks",
+				 "iTunes" : "http://itunes.apple.com/search" };
 /*
 Debug specific functions go here
 */
@@ -72,7 +73,22 @@ function assign_song_values(beatport_song, track)
 
 function lookup_cheaper_songs(bp_song)
 {
-	
+	search_itunes(bp_song);
+};
+
+function search_itunes(bp_song)
+{
+	$.getJSON(API_MAP["iTunes"],{ term : bp_song.qualified_name.replace(/\s/g,'+')}, function(data){
+		if (data.resultCount < 1)
+			return;
+		console.debug("searching: "+bp_song.qualified_name);
+		for (var trackIndex in data.results)
+		{
+			var track = data.results[trackIndex];
+			console.debug("\tFound track: " + track.trackName);
+			console.debug("\tFor the price: "+ track.trackPrice);
+		}	
+	});
 };
 
 
