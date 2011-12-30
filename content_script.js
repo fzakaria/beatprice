@@ -2,9 +2,9 @@
 GLOBAL VARIABLE DECLARATION
 */
 var scraped_songs = [];
-var SCRAPE_DEBUG = false;
+var SCRAPE_DEBUG = true;
 var timeout = null;
-var API_MAP = { "track" : "http://api.beatport.com/catalog/tracks", "release" : "http://api.beatport.com/catalog/tracks",
+var API_MAP = { "Beatport" : "http://api.beatport.com/catalog/tracks",
 				 "iTunes" : "http://itunes.apple.com/search" };
 
 
@@ -45,37 +45,46 @@ document.addEventListener("DOMSubtreeModified", function() {
     timeout = setTimeout(listener, 1000);
 }, false);
 
+
+function Artist(role, name)
+{
+	this.role = role;
+	this.name = name;
+};
+
 /*
 This class will handle holding song information for 
 songs scraped and collected while the user browses beatport
 */
-function BeatportSong(type, track_id){
-	this.type = type;
-	this.id = track_id;
-
-	if (this.type == "track")
-	{
-		$.getJSON(API_MAP[this.type],{ id : this.id, format: "json", v : "1.0" }, function(data){
-			if (data.results.length == 0)
-			{
-				console.debug("Couldn't find anything for id: " + id);
-				return;
-			}
-			if (data.results.length > 1)
-			{
-				console.debug("Found more than 1 track for that ID!")
-				return;
-			}
-			assign_song_values(this, data.results[0]);
-			lookup_cheaper_songs(this);
-		});
-	}
+function BeatportSong(track_id){
+	current_song = this; //so we can
+	current_song.id = track_id;
+	$.getJSON(API_MAP["Beatport"],{ id : this.id, format: "json", v : "1.0" }, function(data){
+		if (data.results.length == 0)
+		{
+			console.debug("Couldn't find anything for id: " + id);
+			return;
+		}
+		if (data.results.length > 1)
+		{
+			console.debug("Found more than 1 track for that ID!")
+			return;
+		}
+		current_song.title = data.results[0].name;
+		current_song.mixName = data.results[0].mixName;
+		current_song.price = data.results[0].price;
+		//Add the artists and role i.e. Artist or Remixer
+		for (var artist_index in data.results[0].artists)
+		{
+			current_song.artists.push( new Artist(data.results[0].artists[artist_index].type, data.results[0].artists[artist_index].name));
+		}
+	});
 };
 
 function assign_song_values(beatport_song, track)
 {
 	dbprint(track);
-	beatport_song.title = track.name;
+	beatport_song.name = track.name;
 	beatport_song.price = track.price.usd; //let's just do USD for now
 	beatport_song.qualified_name = track.name + " ("+ track.mixName + ")";
 	beatport_song.artists = [];
@@ -126,13 +135,15 @@ function search_itunes(bp_song)
 };
 
 
-BeatportSong.prototype.type = "SongType";
 BeatportSong.prototype.id = "SongID";
 BeatportSong.prototype.artists = [];
 BeatportSong.prototype.title = "SongTitle";
-BeatportSong.prototype.qualified_name = "Name&Mix";
-BeatportSong.prototype.price = 0;
+BeatportSong.prototype.mixname = "MixName";
+BeatportSong.prototype.price = Object();
 BeatportSong.prototype.url = "";
+
+Artist.prototype.role = "Role";
+Artist.prototype.name = "name";
 
 
 /*
@@ -144,8 +155,15 @@ General Steps of the extension will be:
 3. Use song information collected to try and find matching songs in other stores and find lowest possible price.
 4. Display found listings to user in popup window or directly on the screen
 */
-function start()
+function start2()
 {
+	var song_buttons = $(".item-actions-playcart.clearfix");
+	song_buttons.append('<a name="test" class="btn-pill btn-pill-large evtBuy"><span>Cheaper</span></a>');
+
+	$.get(" http://api.beatport.com/catalog/tracks?id=3192674", function(data) { dbprint(data); console.log("Here"); });
+	dbprint(test);
+	return;
+
 	var buy_button_links = $('a[name="buy_button_link"]');
 	dbprint("Found: " + buy_button_links.length + " buy button links.");
 
@@ -175,3 +193,16 @@ function start()
 	});
 };
 
+function start()
+{
+	var current_path = window.location.pathname;
+	var current_id = current_path.split('/').pop();
+	newSong = new BeatportSong(current_id);
+	dbprint(newSong);
+};
+
+$("a").ajaxComplete(function(event,request, settings){
+   console.log("HERERE!!!");
+ });
+
+start();
