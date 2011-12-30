@@ -2,11 +2,9 @@
   "name": "Beatport Song Matcher",
   "version": "1.0",
   "description": "Tries to find cheapest song while browsing beatport.",
-  "background_page": "background.html",
   "page_action": {
   	"default_name" : "Find cheap songs",
-  	"default_icon": "Images/icon.png",
-  	"default_popup": "popup.html"
+  	"default_icon": "Images/icon.png"
   },
   "content_scripts":[
   {
