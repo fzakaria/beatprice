@@ -156,7 +156,8 @@ function InsertCheaperButtonElement(cheaperButton)
 	$(cheaperButton).hide();//hide initially unless we find cheaper song!
 	$(cheaperButton).popover({
 		html : true,
-		delayOut: 1000
+		delayOut: 1000,
+		trigger: "hover"
 	});
 }
 
@@ -187,4 +188,28 @@ function start_track_page()
 	lookup_cheaper_songs(newSong, cheaperButton);
 
 };
+
+$.ajaxSetup({
+  global: 'true'
+});
+
+$('a').on('click', function(evt) {
+  console.debug("HERE!!!");
+});
+
+$('a').ajaxSuccess(function() {
+  console.debug("HERE!222222!!");
+});
+
+$(document).ready(function($)
+{
+	console.debug("HERE!112312451254235!");
+});
+
+
+$(window).load(function () {
+ console.debug("HERE!1123123412412412514512412341235!")
+});
+
+
 start_track_page();
