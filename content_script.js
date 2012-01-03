@@ -76,15 +76,14 @@ function search_itunes(bp_song, element)
 	var media_type = "music";
 	var entity_type = "song";
 
+	var MATCH_PERCENTAGE = 0.7;
+
 	$.getJSON(API_MAP["iTunes"],{ term : qualified_name, media : media_type, entity:entity_type}, function(data){
 		if (data.resultCount < 1)
 		{
 			console.log("Found no matching song on iTunes");
 			return;
 		}
-		
-		//match was found! make visible the button
-		$(element).show();
 
 		var newElementAttrib = "<table>"
 		var count = 0;
@@ -99,14 +98,24 @@ function search_itunes(bp_song, element)
 			var price = track.trackPrice;
 			var currencyName = track.currency;
 			var trackName = track.trackName;
+			var trackURL = track.trackViewUrl;
 
-			
-			newElementAttrib += "<tr>";
-			newElementAttrib += "<td>";
-			newElementAttrib += track.trackName;
-			newElementAttrib += "</td>";
-			newElementAttrib += "</tr>";
-			count ++;
+			if (qualified_name.score(trackName) > MATCH_PERCENTAGE ||
+				bp_song.title.score(trackName) > MATCH_PERCENTAGE)
+				{
+					newElementAttrib += "<tr>";
+					newElementAttrib += "<td>";
+					newElementAttrib += "<a href="+trackURL+">"+track.trackName+ " - " + price + currencyName + "</a>";
+					newElementAttrib += "</td>";
+					newElementAttrib += "</tr>";
+					count ++;	
+				}
+		}
+
+		if (count > 0)
+		{
+			//match was found! make visible the button
+			$(element).show();
 		}
 		
 		newElementAttrib += '</table>';
