@@ -12,7 +12,8 @@
   {
   	"matches":["http://www.beatport.com/*"],
   	"run_at" : "document_idle",
-  	"js":["jquery.js", "content_script.js"]
+    "css" : ["bootstrap.min.css"],
+  	"js":["jquery.js", "bootstrap-popover.js", "content_script.js"]
   }
   ],
   "permissions": [
