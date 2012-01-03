@@ -60,12 +60,12 @@ function BeatportSong(track_id){
 };
 
 
-function lookup_cheaper_songs(bp_song)
+function lookup_cheaper_songs(bp_song, element)
 {
-	search_itunes(bp_song);
+	search_itunes(bp_song, element);
 };
 
-function search_itunes(bp_song)
+function search_itunes(bp_song, element)
 {
 	//Itunes doesn't append 'Original Mix to titles when no mix available'
 	var qualified_name = bp_song.title;
@@ -78,51 +78,104 @@ function search_itunes(bp_song)
 
 	$.getJSON(API_MAP["iTunes"],{ term : qualified_name, media : media_type, entity:entity_type}, function(data){
 		if (data.resultCount < 1)
+		{
 			console.log("Found no matching song on iTunes");
 			return;
+		}
+		
+		//match was found! make visible the button
+		$(element).show();
+
+		var newElementAttrib = "<table>"
+		var count = 0;
+		//Lets display first three tracks!
 		for (var trackIndex in data.results)
 		{
-			var track = data.results[trackIndex];
-			var isMatch = false;
-			for (var artistIndex in bp_song.artists)
+			if (count == 3)
 			{
-				var pattern= new RegExp(bp_song.artists[artistIndex], "gi");
-				if (pattern.test(track.artistName))
-				{
-					//We've found a pretty strong match!
-					if (track.trackPrice < bp_song.price && track.trackPrice > 0) //trackPrice of -1 is AlbumOnly
-					{
-						bp_song.price = track.trackPrice;
-						bp_song.url = track.trackViewUrl;
-						console.debug("Found cheaper track!");
-						console.debug("\tTitle: "+bp_song.qualified_name);
-						console.debug("\tPrice: "+bp_song.price);
-						console.debug("\tUrl: "+ bp_song.url);
-						//send the scraped songs to the background.html file to be displayed in the popup
-						chrome.extension.sendRequest(bp_song, function(response) {
-						//we don't care bout the response
-						});
-					}
-				}
+				break;
 			}
+			var track = data.results[trackIndex];
+			var price = track.trackPrice;
+			var currencyName = track.currency;
+			var trackName = track.trackName;
 
-		}	
+			
+			newElementAttrib += "<tr>";
+			newElementAttrib += "<td>";
+			newElementAttrib += track.trackName;
+			newElementAttrib += "</td>";
+			newElementAttrib += "</tr>";
+			count ++;
+		}
+		
+		newElementAttrib += '</table>';
+		element.setAttribute('data-content', newElementAttrib);	
 	});
 };
+
+function CreateCheaperButtonElement()
+{
+	/*This button uses bootstrap.css found @http://twitter.github.com/bootstrap */
+	var newElement = document.createElement('a');
+	newElement.setAttribute("class", "btn danger");
+	newElement.setAttribute('rel', 'popover');
+	newElement.setAttribute('href', '#');
+	newElement.setAttribute('data-content', '<a href="http://www.fzakaria.com">test content</a>');
+	newElement.setAttribute('data-original-title', 'Beatport Price Checker')
+	newElement.innerHTML = 'Found Cheaper!';
+	return newElement;
+}
+
+function FindCheaperButtonSibling()
+{
+	/*page looks for element found in page that follows: it must follow www.beatport.com/track/<track-name>/<track-id> */
+	var parent_element_array = $(".item-actions-playcart.clearfix");
+	var sibling_element = null;
+	if (parent_element_array.length != 1)
+	{
+		console.debug("Found more than one place to add new DOM element");
+		return null;
+	}
+	sibling_element = parent_element_array[0];
+	return sibling_element;
+}
+
+function InsertCheaperButtonElement(cheaperButton)
+{
+	$(FindCheaperButtonSibling()).after(cheaperButton);
+	$(cheaperButton).hide();//hide initially unless we find cheaper song!
+	$(cheaperButton).popover({
+		html : true,
+		delayOut: 1000
+	});
+}
 
 
 function start_track_page()
 {
+	/*Define all variables at start*/
 	var current_path = window.location.pathname;
 	var current_id = current_path.split('/').pop();
-	newSong = new BeatportSong(current_id);
+	var cheaperButton = CreateCheaperButtonElement();
+	/*Step 1: 
+	Check if page is a valid song page.
+	it must follow www.beatport.com/track/<track-name>/<track-id>
+	TO DO: Add parser to add this button for all purchasable songs (not just single track page)
+	*/
+	var newSong = new BeatportSong(current_id);
 	if (!newSong.valid)
 	{
+		console.debug("Song not valid!");
 		return;
 	}
 	console.log(newSong);
-	//Lets now search for cheaper songs!
-	lookup_cheaper_songs(newSong);
-};
 
+	/*Step 2: Insert the cheaper button. The button is hidden unless new songs are found!*/
+	InsertCheaperButtonElement(cheaperButton);
+	
+	/*Step 3: Lets now search for cheaper songs! If we find any, add them to the cheaper button HTML and make visible!*/
+	lookup_cheaper_songs(newSong, cheaperButton);
+
+};
 start_track_page();
