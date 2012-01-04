@@ -152,7 +152,9 @@ function FindCheaperButtonSibling()
 
 function InsertCheaperButtonElement(cheaperButton)
 {
-	$(FindCheaperButtonSibling()).after(cheaperButton);
+	var sibling = FindCheaperButtonSibling();
+	sibling.setAttribute('style', 'width:200px;');
+	$(sibling).after(cheaperButton);
 	$(cheaperButton).hide();//hide initially unless we find cheaper song!
 	$(cheaperButton).popover({
 		html : true,
@@ -191,10 +193,6 @@ function start_track_page()
 
 $.ajaxSetup({
   global: 'true'
-});
-
-$('a').on('click', function(evt) {
-  console.debug("HERE!!!");
 });
 
 $('a').ajaxSuccess(function() {

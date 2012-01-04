@@ -1,6 +1,6 @@
 {
-  "name": "Beatport Song Matcher",
-  "version": "1.0",
+  "name": "Frugal Song Finder for Beatport",
+  "version": "1.1",
   "description": "Tries to find cheapest song while browsing beatport.",
   "page_action": {
   	"default_name" : "Find cheap songs",
