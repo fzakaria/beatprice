@@ -13,7 +13,9 @@ Dependancies and Thanks to:
 
 ##TO DO
 
-1. Add Options Page which can control MATCH_PERCENTAGE and whether to match Artist name and Song name
-2. Cleanup code
-3. Change it so that currency matches during check
-4. Add additional sites such as Amazon store
+1. Have nicer graphics for the Chrome Web Store
+2. Figure a nice way to hook into the Ajax events so that the content script will get executed again
+3. Add Options page which includes settings per user
+4. Add Song Matching from track page to checkout page (based on user feedback)
+5. Cleanup CSS
+6. Add additional website to check (i.e. Amazon store or other electronic music stores)
