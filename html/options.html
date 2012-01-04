@@ -1,0 +1,125 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Options for Frugal Price Finder</title>
+    <meta name="description" content="Find Cheaper Prices for Songs on Beatport">
+    <meta name="author" content="Farid Zakaria">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" /> 
+    <script type="text/javascript" language="Javascript" SRC="/js/jquery.js"></script>
+    <script type="text/javascript" language="Javascript" SRC="/js/bootstrap-alerts.js"></script>
+</head>
+
+
+<script type="text/javascript">
+// Saves options to localStorage.
+function save_options() {
+  var currencySelect = document.getElementById("currencySelect").value;
+  var matchTrackValue = document.getElementById("matchTrackValue").value;
+  var matchTrackEnabled = document.getElementById("matchTrackEnabled").checked;
+  var matchArtistValue = document.getElementById("matchArtistValue").value;
+  var matchArtistEnabled = document.getElementById("matchArtistEnabled").checked;
+  
+  localStorage["CURRENCY"] = currencySelect;
+  localStorage["MATCH_TRACk_VALUE"] = matchTrackValue;
+  localStorage["MATCH_TRACK_ENABLED"] = matchTrackEnabled;
+  localStorage["MATCH_ARTIST_VALUE"] = matchArtistValue;
+  localStorage["MATCH_ARTIST_ENABLED"] = matchArtistEnabled;
+
+  $('.span14').prepend($('<div class="alert-message success hide fade in"><a class="close" href="#">×</a><p><strong>Settings Saved</strong> Next time you come back, you will see these settings.</p></div>'));
+  $('.alert-message').alert();
+  $('.alert-message').show();
+}
+
+// Restores select box state to saved value from localStorage.
+function restore_options() {
+  var currency = localStorage["CURRENCY"];
+  var matchTrackValue = localStorage["MATCH_TRACk_VALUE"];
+  var matchTrackEnabled = localStorage["MATCH_TRACK_ENABLED"];
+  var matchArtistValue = localStorage["MATCH_ARTIST_VALUE"];
+  var matchArtistEnabled = localStorage["MATCH_ARTIST_ENABLED"];
+
+  document.getElementById("currencySelect").value = currency;
+  document.getElementById("matchTrackValue").value = matchTrackValue;
+  document.getElementById("matchTrackEnabled").checked = matchTrackEnabled;
+  document.getElementById("matchArtistValue").value = matchArtistValue;
+  document.getElementById("matchArtistEnabled").checked = matchArtistEnabled;
+}
+
+</script>
+
+<body onload="restore_options()">
+
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">Beatport Price Finder</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1>Settings Page <small>Customize your Frugality</small></h1>
+        </div>
+        <div class="row">
+          <div class="span14">
+            <form>
+              <fieldset>
+                <div class="clearfix">
+                  <label for="mediumSelect">Currency</label>
+                  <div class="input">
+                    <select class="medium" name="mediumSelect" id="currencySelect">
+                      <option>USD</option>
+                    </select>
+                  </div>
+                </div><!-- /clearfix -->
+              <div class="clearfix">
+                <label for="appendedInput">Match Track Name</label>
+                <div class="input">
+                  <div class="input-append">
+                    <input class="mini" id="matchTrackValue" name="appendedInput" size="16" type="text" value="0.7">
+                    <label class="add-on active"><input type="checkbox" name="" id="matchTrackEnabled" checked="checked"></label>
+                  </div>
+                </div>
+              </div><!-- /clearfix -->
+            <div class="clearfix">
+            <label for="appendedInput">Match Artist Name</label>
+            <div class="input">
+              <div class="input-append">
+                <input class="mini" id="matchArtistValue" name="appendedInput" size="16" type="text" value="0.7">
+                <label class="add-on active"><input type="checkbox" name="" id="matchArtistEnabled" value=""></label>
+              </div>
+            </div>
+          </div><!-- /clearfix -->
+          <div class="clearfix">
+            <label id="optionsCheckboxes">Sites to Check</label>
+            <div class="input">
+              <ul class="inputs-list">
+                <li>
+                  <label>
+                    <input type="checkbox" name="optionsCheckboxes" value="iTunes" checked="checked">
+                    <span>iTunes</span>
+                  </label>
+                </li>
+              </ul>
+              <span class="help-block">
+                <strong>Note:</strong> These are the sites that will be checked against to see if the songs are cheaper.
+              </span>
+            </div>
+          </div><!-- /clearfix -->
+          <div class="actions">
+          </div>
+        </fieldset>
+      </form>
+          <button class="btn primary" value="Save changes" onclick="save_options()">Submit</button>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /container -->
+
+
+</body>
+
+</html>

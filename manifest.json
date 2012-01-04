@@ -4,16 +4,16 @@
   "description": "Tries to find cheapest song while browsing beatport.",
   "page_action": {
   	"default_name" : "Find cheap songs",
-  	"default_icon": "Images/icon.png"
+  	"default_icon": "/images/icon.png"
   },
   "content_scripts":[
   {
   	"matches":["http://www.beatport.com/*"],
   	"run_at" : "document_idle",
-    "css" : ["bootstrap.min.css"],
-  	"js":["jquery.js", "string_score.min.js", "bootstrap-twipsy.js", "bootstrap-popover.js", "content_script.js"]
-  }
-  ],
+    "css" : ["/css/bootstrap.min.css"],
+  	"js":["/js/jquery.js", "/js/string_score.min.js", "/js/bootstrap-twipsy.js", "/js/bootstrap-popover.js", "/js/content_script.js"]
+  }],
+  "options_page" : "/html/options.html",
   "permissions": [
   	"tabs",
     "http://api.beatport.com/*",
