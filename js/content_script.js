@@ -191,23 +191,26 @@ function start_track_page()
 
 };
 
-$.ajaxSetup({
-  global: 'true'
+$(function() {
+  
+  var tracking = false;
+  
+  function checkBodyClass() {
+    if($("body").hasClass("wait")) {
+      tracking = true;
+      setTimeout(function() { checkBodyClass(); },100);
+    } else {
+      if(tracking === true) {
+        console.log("track page");
+        tracking = false;
+        start_track_page();
+      }
+      setTimeout(function() { checkBodyClass(); },50);
+    }
+  }
+  
+  checkBodyClass();
+  
 });
-
-$('a').ajaxSuccess(function() {
-  console.debug("HERE!222222!!");
-});
-
-$(document).ready(function($)
-{
-	console.debug("HERE!112312451254235!");
-});
-
-
-$(window).load(function () {
- console.debug("HERE!1123123412412412514512412341235!")
-});
-
 
 start_track_page();
