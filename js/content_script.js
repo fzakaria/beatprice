@@ -191,27 +191,6 @@ function start_track_page()
 
 };
 
-$(function() {
-  
-  var tracking = false;
-  
-  function checkBodyClass() {
-    if($("body").hasClass("wait")) {
-      tracking = true;
-      setTimeout(function() { checkBodyClass(); },100);
-    } else {
-      if(tracking === true) {
-        console.log("track page");
-        tracking = false;
-        start_track_page();
-      }
-      setTimeout(function() { checkBodyClass(); },50);
-    }
-  }
-  
-  checkBodyClass();
-  
-});
 
 var main = function() {
 
@@ -226,6 +205,7 @@ var main = function() {
 			console.log("Ajax complete.");
 			fireBeatPriceEvent();
    		});
+
 };
 
 // Lets create the script objects
@@ -236,6 +216,7 @@ injectedScript.text = '('+main+')("");';
 
 document.body.addEventListener('BeatPriceEvent', function() {
 	console.log("Received event!");
+	start_track_page();
 });
 
 
