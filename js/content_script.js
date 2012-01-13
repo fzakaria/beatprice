@@ -213,4 +213,30 @@ $(function() {
   
 });
 
+var main = function() {
+
+   		var beatpriceEvent = document.createEvent('Event');
+   		beatpriceEvent.initEvent('BeatPriceEvent', true, true);
+
+   		function fireBeatPriceEvent() {
+   			document.body.dispatchEvent(beatpriceEvent);
+   		};
+
+   		jQuery(document).ajaxComplete(function(event,request, settings){
+			console.log("Ajax complete.");
+			fireBeatPriceEvent();
+   		});
+};
+
+// Lets create the script objects
+var injectedScript = document.createElement('script');
+injectedScript.type = 'text/javascript';
+injectedScript.text = '('+main+')("");';
+(document.body || document.head).appendChild(injectedScript);
+
+document.body.addEventListener('BeatPriceEvent', function() {
+	console.log("Received event!");
+});
+
+
 start_track_page();
